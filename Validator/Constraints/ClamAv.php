@@ -16,4 +16,6 @@ class ClamAv extends Constraint
     public $message = "The file did not pass the virus scanner: {{reason}}";
 
     public $socket = "unix:///var/run/clamav/clamd.ctl";
+
+    public $chmod = 0644;
 }

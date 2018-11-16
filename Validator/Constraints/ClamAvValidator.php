@@ -2,6 +2,7 @@
 
 namespace ferdynator\ClamAvConstraint\Validator\Constraints;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Xenolope\Quahog\Client;
 use Socket\Raw\Factory;
 use Symfony\Component\HttpFoundation\File\File;
@@ -23,7 +24,8 @@ class ClamAvValidator extends ConstraintValidator
         }
 
         $socket = (new Factory())->createClient($constraint->socket);
-        $client = new Client($socket);
+        $client = new Client($socket, 1, PHP_NORMAL_READ);
+        $client->startSession();
 
         if (null === $value || '' === $value || !$client->ping()) {
             return;
@@ -31,11 +33,15 @@ class ClamAvValidator extends ConstraintValidator
 
         $path = $value instanceof File ? $value->getPathname() : (string) $value;
 
+        @chmod($path, $constraint->chmod);
+
         $scanResult = $client->scanFile($path);
         if ($scanResult['status'] !== Client::RESULT_OK) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{reason}}', $scanResult['reason'])
                 ->addViolation();
         }
+
+        $client->endSession();
     }
 }
