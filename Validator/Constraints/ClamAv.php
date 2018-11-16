@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * Class ClamAvValidator
  *
+ * @Annotation
  * @package ferdynator\ClamAvConstraint\Validator\Constraints
  */
 class ClamAv extends Constraint
